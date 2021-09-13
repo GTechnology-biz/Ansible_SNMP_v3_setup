@@ -1,0 +1,67 @@
+- name: 'linux : check create snmp config'
+  become: true
+  lineinfile: 
+    path: '{{ snmp_config }}'
+    line: 'rouser {{ snmp_user }} priv'
+  register: check_snmp
+  check_mode: true
+  tags:
+    - configuration
+
+
+
+- block:
+
+    - name: 'linux : install snmp'
+      become: true
+      package:
+        name: '{{ item }}'
+      with_items:
+        - '{{ snmp_packages }}'
+      tags:
+        - packages
+
+    - name: 'linux : stopped snmp'
+      become: true
+      service:
+        name: '{{ snmp_service_name }}'
+        state: stopped
+
+    - name: Backup Config
+      become: true
+      copy:
+        src: '{{ snmp_config }}'
+        dest: '{{ snmp_config_backup }}'
+
+    - name: 'linux : create user snmp config'
+      become: true
+      lineinfile: 
+          path: '{{ snmp_user_config }}'
+          line: 'createUser {{ snmp_user }} SHA {{ snmp_password }} AES {{ snmp_encryption }}'
+          insertafter: EOF
+
+    - name: 'linux : create snmp config'
+      become: true
+      lineinfile: 
+        path: '{{ snmp_config }}'
+        line: 'rouser {{ snmp_user }} priv'
+        insertafter: EOF
+
+    - name: 'linux : started snmp'
+      become: true
+      service:
+        name: '{{ snmp_service_name }}'
+        state: started
+
+    - name: Test SNMPv3
+      action: command snmpwalk -v3 -l authPriv -u {{ snmp_user }} -a SHA -A {{ snmp_password }} -x AES -X {{ snmp_encryption }} 192.168.1.127 sysName.0
+      
+  rescue: 
+    - name: Roll back
+      include_tasks: 'rollback.yml'
+        
+    
+
+  when: check_snmp.changed
+  tags:
+    - configuration

@@ -1,0 +1,5 @@
+---
+- hosts: ansible1
+ 
+  roles: 
+     - role: snmp_v3
