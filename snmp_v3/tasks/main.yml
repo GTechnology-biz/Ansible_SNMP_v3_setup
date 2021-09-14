@@ -1,5 +1,5 @@
+- name: install snmp
+  include_tasks: 'install.yml'
+
 - name: include distribution tasks
   include_tasks: 'Linux.yml'
-  tags:
-    - configuration
-    - packages
