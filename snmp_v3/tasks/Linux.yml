@@ -1,3 +1,12 @@
+- name: 'linux : install snmp'
+  become: true
+  package:
+    name: '{{ item }}'
+  with_items:
+    - '{{ snmp_packages }}'
+  tags:
+    - packages
+
 - name: 'linux : check create snmp config'
   become: true
   lineinfile: 
@@ -12,14 +21,7 @@
 
 - block:
 
-    - name: 'linux : install snmp'
-      become: true
-      package:
-        name: '{{ item }}'
-      with_items:
-        - '{{ snmp_packages }}'
-      tags:
-        - packages
+
 
     - name: 'linux : stopped snmp'
       become: true
