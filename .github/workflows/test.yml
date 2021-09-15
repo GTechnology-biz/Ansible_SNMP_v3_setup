@@ -13,7 +13,7 @@ jobs:
 
     - name: ansible check with centos:centos6
       # replace "master" with any valid ref
-      uses: roles-ansible/check-ansible-centos-centos6-action@master
+      uses: GTechnology-biz/check-ansible-centos-centos6-action@master
       with:
         targets: "playbook.yml"
         #  [required]
