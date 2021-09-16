@@ -1,16 +1,11 @@
-snmp_encryption: snmp_encryption
-snmp_password: snmp_password
-snmp_user: snmp
+snmp_encryption: thisiswhereencryptionpaswordgoes
+snmp_password: thisiswhereapasswordgoes
+snmp_user: test_snmp_user
 snmp_packages:
   - net-snmp
   - net-snmp-utils
-
 snmp_config: /etc/snmp/snmpd.conf
 snmp_config_backup: /etc/snmp/snmpd.conf.bak
 snmp_user_config: /var/lib/net-snmp/snmpd.conf
 snmp_daemon_config: /etc/sysconfig/snmpd
 snmp_service_name: snmpd
-
-
-
- 

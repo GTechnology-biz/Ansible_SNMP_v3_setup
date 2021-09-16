@@ -1,18 +1,24 @@
-    - name: 'linux : stopped snmp'
-      become: true
-      service:
-        name: '{{ snmp_service_name }}'
-        state: stopped
+- name: "linux : stopped snmp"
+  become: true
+  service:
+    name: "{{ snmp_service_name }}"
+    state: stopped
 
-    - name: Restore Config
-      become: true
-      copy:
-        remote_src: yes
-        src: '{{ snmp_config_backup }}'
-        dest: '{{ snmp_config }}'
+- name: Restore Config
+  become: true
+  copy:
+    remote_src: yes
+    src: "{{ snmp_config_backup }}"
+    dest: "{{ snmp_config }}"
 
-    - name: 'linux : started snmp'
-      become: true
-      service:
-        name: '{{ snmp_service_name }}'
-        state: started
+- name: "linux : started snmp"
+  become: true
+  service:
+    name: "{{ snmp_service_name }}"
+    state: started
+
+- name: "Remove Snmp v3 flag"
+  become: true
+  file:
+    path: /opt/hostedcafe/scripts/.v3
+    state: absent

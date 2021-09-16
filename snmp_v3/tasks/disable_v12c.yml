@@ -1,0 +1,28 @@
+## SNMP 1 and 2c diable process from https://access.redhat.com/solutions/400123
+
+- name: Disable snmp v1 and v2c
+  become: true
+  lineinfile:
+    dest: "{{ snmp_config }}"
+    regexp: "(?i)^(com2sec notConfigUser.*)"
+    line: '# \1'
+    backrefs: yes
+    state: present
+
+- name: Disable snmp v1 and v2c 2nd
+  become: true
+  lineinfile:
+    dest: "{{ snmp_config }}"
+    regexp: "(?i)^(access  notConfigGroup.*)"
+    line: '# \1'
+    backrefs: yes
+    state: present
+
+- name: Disable snmp v1
+  become: true
+  lineinfile:
+    dest: "{{ snmp_config }}"
+    regexp: "(?i)^(group notConfigGroup v1.*)"
+    line: '# \1'
+    backrefs: yes
+    state: present

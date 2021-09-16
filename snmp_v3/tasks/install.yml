@@ -1,24 +1,23 @@
-- name: 'linux : install snmp'
+- name: "linux : install snmp"
   become: true
   package:
-    name: '{{ item }}'
+    name: "{{ item }}"
   with_items:
-    - '{{ snmp_packages }}'
+    - "{{ snmp_packages }}"
   register: check_install
   check_mode: true
 
-- block: 
-  - name: 'linux : started snmp'
-    become: true
-    service:
-      name: '{{ snmp_service_name }}'
-      state: started
-
-  - name: enabled snmp
-    become: true
-    service:
+- block:
+    - name: "linux : started snmp"
+      become: true
+      service:
         name: "{{ snmp_service_name }}"
-        enabled: true   
+        state: started
 
+    - name: enabled snmp
+      become: true
+      service:
+        name: "{{ snmp_service_name }}"
+        enabled: true
 
   when: check_install.changed

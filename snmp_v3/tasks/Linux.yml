@@ -1,50 +1,60 @@
-- name: 'linux : check create snmp config'
+- name: "linux : check create snmp config"
   become: true
-  lineinfile: 
-    path: '{{ snmp_config }}'
-    line: 'rouser {{ snmp_user }} priv'
+  lineinfile:
+    path: "{{ snmp_config }}"
+    line: "rouser {{ snmp_user }} priv"
   register: check_snmp
   check_mode: true
 
 - block:
-    - name: 'linux : stopped snmp'
+    - name: "linux : stopped snmp"
       become: true
       service:
-        name: '{{ snmp_service_name }}'
+        name: "{{ snmp_service_name }}"
         state: stopped
 
     - name: Backup Config
       become: true
       copy:
-        src: '{{ snmp_config }}'
-        dest: '{{ snmp_config_backup }}'
+        src: "{{ snmp_config }}"
+        dest: "{{ snmp_config_backup }}"
 
-    - name: 'linux : create user snmp config'
+    - name: "linux : create user snmp config"
       become: true
-      lineinfile: 
-          path: '{{ snmp_user_config }}'
-          line: 'createUser {{ snmp_user }} SHA {{ snmp_password }} AES {{ snmp_encryption }}'
-          insertafter: EOF
-
-    - name: 'linux : create snmp config'
-      become: true
-      lineinfile: 
-        path: '{{ snmp_config }}'
-        line: 'rouser {{ snmp_user }} priv'
+      lineinfile:
+        path: "{{ snmp_user_config }}"
+        line: "createUser {{ snmp_user }} SHA {{ snmp_password }} AES {{ snmp_encryption }}"
         insertafter: EOF
 
-    - name: 'linux : started snmp'
+    - name: "linux : create snmp config"
+      become: true
+      lineinfile:
+        path: "{{ snmp_config }}"
+        line: "rouser {{ snmp_user }} priv"
+        insertafter: EOF
+
+    - name: "linux : started snmp"
       become: true
       service:
-        name: '{{ snmp_service_name }}'
+        name: "{{ snmp_service_name }}"
         state: started
 
     - name: Test SNMPv3
       action: command snmpwalk -v3 -l authPriv -u {{ snmp_user }} -a SHA -A {{ snmp_password }} -x AES -X {{ snmp_encryption }} 127.0.0.1 sysName.0
-      
 
-  rescue: 
+    - name: Snmp v3 flag
+      become: true
+      lineinfile:
+        path: /opt/hostedcafe/scripts/.v3
+        line: "1"
+        create: yes
+
+
+    - name: disable legacy SNMP
+      include_tasks: 'disable_v12c.yml'
+
+  rescue:
     - name: Roll back
-      include_tasks: 'rollback.yml'
+      include_tasks: "rollback.yml"
 
   when: check_snmp.changed
